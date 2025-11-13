@@ -9,6 +9,7 @@ interface BoardCardProps {
   onClick: () => void;
 }
 
+
 export const BoardCard = ({ board, onClick }: BoardCardProps) => {
   const listsCount = board.lists.length;
   const cardsCount = board.lists.reduce((acc, list) => acc + list.cards.length, 0);
