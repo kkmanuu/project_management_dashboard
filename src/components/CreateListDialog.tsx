@@ -84,3 +84,4 @@ export const CreateListDialog = ({ boardId, open, onOpenChange }: CreateListDial
     </Dialog>
   );
 };
+
