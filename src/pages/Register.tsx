@@ -9,7 +9,6 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { LayoutDashboard, Mail, Lock, User } from 'lucide-react';
 
-
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
