@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useStore } from '@/store/useStore';
@@ -7,34 +7,42 @@ import { Card } from '@/components/ui/card';
 import { Plus, LogOut, LayoutGrid } from 'lucide-react';
 import { BoardCard } from '@/components/BoardCard';
 import { CreateBoardDialog } from '@/components/CreateBoardDialog';
-import { useState } from 'react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  // Global store values
   const user = useStore((state) => state.user);
   const boards = useStore((state) => state.boards);
   const logout = useStore((state) => state.logout);
   const setCurrentBoard = useStore((state) => state.setCurrentBoard);
+
+  // Controls opening of "Create Board" modal
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
+  // Redirect user to login page if they are not authenticated
   useEffect(() => {
     if (!user) {
       navigate('/login');
     }
   }, [user, navigate]);
 
+  // Logs out the user and redirects them
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  // Handles opening a single board view
   const handleBoardClick = (boardId: string) => {
     setCurrentBoard(boardId);
     navigate(`/board/${boardId}`);
   };
 
+  // Prevent rendering if user is missing (avoids UI flash)
   if (!user) return null;
 
+  // Framer Motion animation container (stagger animation between items)
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -45,6 +53,7 @@ const Dashboard = () => {
     },
   };
 
+  // Animation for each board card
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
@@ -52,19 +61,27 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary">
-      {/* Header */}
+
+      {/* === Header === */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
+
+            {/* App logo + user greeting */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <LayoutGrid className="w-5 h-5 text-primary-foreground" />
               </div>
+
               <div>
                 <h1 className="text-xl font-bold text-foreground">Project Manager</h1>
-                <p className="text-sm text-muted-foreground">Welcome back, {user.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back, {user.name}
+                </p>
               </div>
             </div>
+
+            {/* Logout button */}
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
               Logout
@@ -73,9 +90,10 @@ const Dashboard = () => {
         </div>
       </header>
 
-
-      {/* Main Content */}
+      {/* === Main Content === */}
       <main className="container mx-auto px-4 py-8">
+
+        {/* Page title + create board button */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -85,12 +103,14 @@ const Dashboard = () => {
             <h2 className="text-3xl font-bold text-foreground mb-2">Your Boards</h2>
             <p className="text-muted-foreground">Manage and organize your projects</p>
           </div>
+
           <Button onClick={() => setIsCreateDialogOpen(true)} size="lg">
             <Plus className="w-5 h-5 mr-2" />
             New Board
           </Button>
         </motion.div>
 
+        {/* List of boards */}
         <motion.div
           variants={container}
           initial="hidden"
@@ -104,6 +124,7 @@ const Dashboard = () => {
           ))}
         </motion.div>
 
+        {/* Empty state message when no boards exist */}
         {boards.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -113,10 +134,15 @@ const Dashboard = () => {
           >
             <Card className="max-w-md mx-auto p-8">
               <LayoutGrid className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">No boards yet</h3>
+
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                No boards yet
+              </h3>
+
               <p className="text-muted-foreground mb-6">
                 Create your first board to start organizing your projects
               </p>
+
               <Button onClick={() => setIsCreateDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Board
@@ -126,7 +152,11 @@ const Dashboard = () => {
         )}
       </main>
 
-      <CreateBoardDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+      {/* Modal for creating a new board */}
+      <CreateBoardDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </div>
   );
 };
