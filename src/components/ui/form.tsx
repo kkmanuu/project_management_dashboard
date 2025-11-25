@@ -6,8 +6,10 @@ import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useF
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
+// Wrap react-hook-form Provider
 const Form = FormProvider;
 
+// Context to share field name across form components
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -17,12 +19,13 @@ type FormFieldContextValue<
 
 const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
 
+// Connect field to react-hook-form Controller
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  ...props
-}: ControllerProps<TFieldValues, TName>) => {
+>(
+  props: ControllerProps<TFieldValues, TName>,
+) => {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />
@@ -30,6 +33,7 @@ const FormField = <
   );
 };
 
+// Hook to access form field state (error, ids, etc.)
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -53,12 +57,14 @@ const useFormField = () => {
   };
 };
 
+// Context for unique form item ID
 type FormItemContextValue = {
   id: string;
 };
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
 
+// Wraps a single form field section
 const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     const id = React.useId();
@@ -72,16 +78,25 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 );
 FormItem.displayName = "FormItem";
 
+// Label linked to form field
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
-  return <Label ref={ref} className={cn(error && "text-destructive", className)} htmlFor={formItemId} {...props} />;
+  return (
+    <Label
+      ref={ref}
+      className={cn(error && "text-destructive", className)}
+      htmlFor={formItemId}
+      {...props}
+    />
+  );
 });
 FormLabel.displayName = "FormLabel";
 
+// Handles links form control to field state (error, aria props)
 const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.ComponentPropsWithoutRef<typeof Slot>>(
   ({ ...props }, ref) => {
     const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
@@ -99,26 +114,38 @@ const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.Compon
 );
 FormControl.displayName = "FormControl";
 
+// Optional helper text under input
 const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => {
     const { formDescriptionId } = useFormField();
 
-    return <p ref={ref} id={formDescriptionId} className={cn("text-sm text-muted-foreground", className)} {...props} />;
+    return (
+      <p
+        ref={ref}
+        id={formDescriptionId}
+        className={cn("text-sm text-muted-foreground", className)}
+        {...props}
+      />
+    );
   },
 );
 FormDescription.displayName = "FormDescription";
 
+// Error message or custom message
 const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, children, ...props }, ref) => {
     const { error, formMessageId } = useFormField();
     const body = error ? String(error?.message) : children;
 
-    if (!body) {
-      return null;
-    }
+    if (!body) return null;
 
     return (
-      <p ref={ref} id={formMessageId} className={cn("text-sm font-medium text-destructive", className)} {...props}>
+      <p
+        ref={ref}
+        id={formMessageId}
+        className={cn("text-sm font-medium text-destructive", className)}
+        {...props}
+      >
         {body}
       </p>
     );
