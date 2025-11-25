@@ -1,22 +1,28 @@
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
+// Forwarding ref to allow parent components to directly access the <input> element
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
       <input
-        type={type}
+        type={type} // Input type (text, email, password, etc.)
+        ref={ref}   // Attach the forwarded ref
         className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className,
+          // Tailwind/utility classes for styling
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base " +
+            "ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium " +
+            "file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none " +
+            "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 " +
+            "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          className // Merge with any additional classes passed via props
         )}
-        ref={ref}
-        {...props}
+        {...props} // Spread other props (like onChange, value, placeholder, etc.)
       />
     );
-  },
+  }
 );
+
 Input.displayName = "Input";
 
 export { Input };
