@@ -1,16 +1,19 @@
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, toast } from "sonner";
 
+// Type for Toaster props based on Sonner's component
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  // Get current theme (light, dark, or system)
   const { theme = "system" } = useTheme();
 
-  
   return (
     <Sonner
+      // Apply current theme to the toast system
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      // Custom styling for toast components
       toastOptions={{
         classNames: {
           toast:
